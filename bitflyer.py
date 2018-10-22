@@ -8,17 +8,15 @@ def _req2dic(url): # 呼び出す必要なし
     dic = json.loads(resp.content)
     return dic
 
-def _urlBuilder(*args): # 呼び出す必要なし
+def _urlBuilder(api_name, **kwargs): # 呼び出す必要なし
 
-    url = 'https://api.bitflyer.com/v1/' + args[0] + '/'
-    if len(args) > 1:
-        for i in range(1, len(args)):
-            url += '?'
-            if type(args[i]) != "str":
-                url += str(args[i])
-            else:
-                url += args[i]
-
+    url = 'https://api.bitflyer.com/v1/' + api_name + '/?'
+    # print(len(kwargs))
+    for i, (key, value) in enumerate(kwargs.items(), 1):
+        url += (key + '=' + str(value))
+        if i != len(kwargs):
+            url += '&'
+    # print(url)
     return url
 
 def getMarkets(current="jpy"):
@@ -54,10 +52,9 @@ def getMarkets(current="jpy"):
     ]
     """
     if (current != 'jpy'):
-        url = _urlBuilder("getmarkets", current)
+        url = _urlBuilder("getmarkets/" + current)
     else:
         url = _urlBuilder("getmarkets")
-
     return _req2dic(url)
 
 def getBoard(product_code):
@@ -77,7 +74,7 @@ def getBoard(product_code):
         }
     }
     """
-    url = _urlBuilder("getboard", product_code)
+    url = _urlBuilder("getboard", **{'product_code': product_code})
     return _req2dic(url)
 
 def getTicker(product_code):
@@ -98,7 +95,7 @@ def getTicker(product_code):
         "volume_by_product": 2181.66815001
     }
     """
-    url = _urlBuilder("getticker", product_code)
+    url = _urlBuilder("getticker", **{'product_code': product_code})
     return _req2dic(url)
 
 def getExec(product_code, count=100, before=0, after=0):
@@ -117,19 +114,18 @@ def getExec(product_code, count=100, before=0, after=0):
         ...
     ]
     """
-    url = _urlBuilder("getexecutions", count, before, after)
+    url = _urlBuilder("getexecutions", **{'count': count, 'before': before, 'after': after})
     return _req2dic(url)
 
-def getChats(from_date=None):
+def getChats(from_date="", country="jp"):
 
     """
-    from_dateはISO 8601フォーマットの日付だと思うが，なぜか反映されない．
-    例えば"2018-10-22T12:00:00.000+09:00"とか？
-    エンコードも必要？わからん．保留
-    country: jp, usa, eu
+    from_dateはISO 8601フォーマットの日付．
+    例えば"2018-10-22T12:00:00.000"とか.
     何も指定しないと5日前くらいからのチャットが全部返ってくるっぽい．
     件数にするとだいたい54800件だった．
-    応答は遅い．
+    country: jp, usa, eu
+    応答はやや遅い．
     出力例：
     [
         {
@@ -145,7 +141,10 @@ def getChats(from_date=None):
         ...
     ]
     """
-    url = _urlBuilder("getchats", from_date)
+    if country == "jp":
+        url = _urlBuilder("getchats", **{'from_date': from_date})
+    else:
+        url = _urlBuilder("getchats/" + country, **{'from_date': from_date})
     return _req2dic(url)
 
 def getHealth(product_code):
@@ -156,7 +155,7 @@ def getHealth(product_code):
         "status": "NORMAL"
     }
     """
-    url = _urlBuilder("gethealth", product_code)
+    url = _urlBuilder("gethealth", **{'product_code': product_code})
     return _req2dic(url)
 
 def getBoardState(product_code):
@@ -168,7 +167,7 @@ def getBoardState(product_code):
         "state": "RUNNING"
     }
     """
-    url = _urlBuilder("getboardstate", product_code)
+    url = _urlBuilder("getboardstate", **{'product_code': product_code})
     return _req2dic(url)
 
 # てすと
@@ -182,12 +181,12 @@ if __name__ == "__main__":
     print("best_ask:", board_fx['asks'][0])
     ticker_fx = getTicker(code_fx)
     print("ticker:", ticker_fx)
-    executions = getExec(code_fx)
-    print("exec[0]:", executions[0])
-    chats = getChats()
+    executions = getExec(code_fx, count=1)
+    print("exec:", executions)
+    chats = getChats("2018-10-22T00:00:00.000+09:00")
     print("last_chat:", chats[len(chats) - 1])
     health = getHealth(code_fx)
     print("health:", health)
     board_state = getBoardState(code_fx)
     print("board_state:", board_state)
-    print("よくできました")
+    print(str("よくできました"))

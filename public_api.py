@@ -1,10 +1,10 @@
-from http_api import HttpAPI
+from bitFlyerAPI import BF_API
 
-class PublicAPI(HttpAPI):
+class PublicAPI(BF_API):
 
     def __init__(self):
 
-        super().__init__()
+        super().__init__("https://api.bitflyer.com/v1/")
 
     def getMarkets(self):
 

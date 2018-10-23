@@ -24,16 +24,13 @@ class BF_API():
                     url += '&'
         return url
 
-    def _call(self, request, **query):
+    def _call(self, path, **query):
 
-        req = request.split(' ')
-        method = req[0]
-        path = req[1]
         url = self._urlBuilder(path, **query)
         dic = self._req2dic(url)
         return dic
 
 # test
 if __name__ == "__main__":
-    api = BF_API("https://api.bitflyer.com")
-    print(api._call("GET /v1/getexecutions", product_code="BTC_JPY", count=1, before=0, after=0))
+    api = BF_API("https://api.bitflyer.com/v1/")
+    print(api._call("getexecutions", product_code="BTC_JPY", count=1, before=0, after=0))

@@ -40,8 +40,7 @@ class PublicAPI(ApiHitter):
 
 # test
 if __name__ == "__main__":
-    api = PublicAPI(key="YOUR_API_KEY", \
-                    secret="YOUR_API_SECRET" )
+    api = PublicAPI()
     print("markets:", api.getMarkets())
     code_fx = api.getMarkets()[1]['product_code']   # 'FX_BTC_JPY'
     board_fx = api.getBoard(code_fx)
@@ -52,7 +51,7 @@ if __name__ == "__main__":
     print("ticker:", ticker_fx)
     executions = api.getExecutions(code_fx, count=1)
     print("exec:", executions)
-    chats = api.getChats(b"2018-10-22T00:00:00.000")
+    chats = api.getChats("2018-10-22T00:00:00.000")
     print("last_chat:", chats[0])
     health = api.getHealth(code_fx)
     print("health:", health)

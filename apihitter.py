@@ -17,15 +17,16 @@ class ApiHitter():
         return json.loads(responce.content)
 
     def _buildQuery(self, **params):
-        query = ""
+        query_list = []
         if params is not None:
             params = {key: params[key] for key in params if params[key] is not None}
             if len(params) != 0:
-                query += '?'
+                query_list.append('?')
                 for i, (key, value) in enumerate(params.items(), 1):
-                    query += (key + '=' + str(value))
+                    query_list.extend([key, '=', str(value)])
                     if i != len(params):
-                        query += '&'
+                        query_list.append('&')
+        query = "".join(query_list)
         return query
 
     def _generateSign(self, timestamp, method, path, **params):
